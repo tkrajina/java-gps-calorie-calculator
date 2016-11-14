@@ -1,12 +1,24 @@
 package info.puzz.calories;
 
-/**
- * Created by puzz on 14/11/2016.
- */
+import lombok.Getter;
 
-public interface Location {
-    float getSpeed();
-    long getTime();
-    double getLatitude();
-    double getLongitude();
+public final class Location {
+    @Getter final double latitude;
+    @Getter final double longitude;
+
+    @Getter final Float speed;
+    @Getter final Float time;
+    @Getter final Integer elevation;
+
+    public Location(double latitude, double longitude, Float speed, Float time, Integer elevation) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.speed = speed;
+        this.time = time;
+        this.elevation = elevation;
+    }
+
+    public double distance (Location loc) {
+        return LocationUtils.distance(this, loc);
+    }
 }
