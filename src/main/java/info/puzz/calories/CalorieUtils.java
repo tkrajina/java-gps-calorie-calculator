@@ -15,6 +15,8 @@
  */
 package info.puzz.calories;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by puzz on 11/11/2016.
  */
@@ -45,8 +47,18 @@ public class CalorieUtils {
      */
     private static final double K2 = 0.185;
 
-    public static double getCalorie(
-            Location start, Location stop, double grade, double weight, ActivityType activityType) {
+    public static double getCalorie(Location start, Location stop, double weight, ActivityType activityType) {
+        double distance = start.distance(stop);
+        int elevationDiff = 0;
+        if (start.getElevation() != null && stop.getElevation() != null) {
+            elevationDiff = stop.getElevation().intValue() - start.getElevation().intValue();
+        }
+        double grade = elevationDiff / distance;
+        System.out.println("grade=" + grade);
+        return getCalorie(start, stop, grade, weight, activityType);
+    }
+
+    public static double getCalorie(Location start, Location stop, double grade, double weight, ActivityType activityType) {
         if (activityType == ActivityType.INVALID) {
             return 0.0;
         }
@@ -56,7 +68,17 @@ public class CalorieUtils {
         }
 
         // Speed in m/s
-        double speed = (start.getSpeed() + stop.getSpeed()) / 2.0;
+        double speed;
+        if (start.getSpeed() != null && stop.getSpeed() != null) {
+            speed = (start.getSpeed().floatValue() + stop.getSpeed().floatValue()) / 2.0;
+            System.out.println("speed from locations:" + speed);
+        } else {
+            if (start.getTime() == stop.getTime()) {
+                return 0.0;
+            }
+            speed = Math.abs(start.distance(stop) / TimeUnit.MILLISECONDS.toSeconds(stop.getTime() - start.getTime()));
+            System.out.println("speed calculated:" + speed);
+        }
         // Duration in min
         double duration = (double) (stop.getTime() - start.getTime()) * UnitConversions.MS_TO_S
                 * UnitConversions.S_TO_MIN;
