@@ -15,6 +15,7 @@
  */
 package info.puzz.calories;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +47,19 @@ public class CalorieUtils {
      * Lumped constant for aerodynamic drag (kg/m)
      */
     private static final double K2 = 0.185;
+
+    public static double getCalorie(Iterator<Location> locations, double weight, ActivityType activityType) {
+        double calories = 0D;
+        Location previous = null;
+        while (locations.hasNext()) {
+            Location loc = locations.next();
+            if (previous != null) {
+                calories += getCalorie(loc, previous, weight, activityType);
+            }
+            previous = loc;
+        }
+        return calories;
+    }
 
     public static double getCalorie(Location start, Location stop, double weight, ActivityType activityType) {
         double distance = start.distance(stop);
